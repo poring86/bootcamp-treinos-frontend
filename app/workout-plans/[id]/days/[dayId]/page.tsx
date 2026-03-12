@@ -66,6 +66,8 @@ export default async function WorkoutDayPage({
   const hasInProgressSession = !!inProgressSession;
   const hasCompletedSession = !!completedSession;
 
+  console.log("DEBUG: Workout Day Cover Image URL:", coverImageUrl);
+
   return (
     <div className="flex min-h-svh flex-col bg-background pb-24">
       <div className="flex items-center justify-between px-5 py-4">
@@ -86,6 +88,7 @@ export default async function WorkoutDayPage({
               alt={name}
               fill
               className="pointer-events-none object-cover"
+              unoptimized
             />
           )}
           <div className="absolute inset-0 bg-foreground/40" />

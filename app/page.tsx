@@ -22,15 +22,14 @@ export default async function Home() {
   const today = dayjs();
   const homeData = await getHomeData(today.format("YYYY-MM-DD"));
 
-  console.log("[DEBUG] Session data:", !!session.data?.user);
-  console.log("[DEBUG] Home data status:", homeData.status);
-
-  if (homeData.status !== 200) {
-    console.log("[DEBUG] Redirecting to /auth - Status:", homeData.status);
+  if (homeData.status === 401) {
     redirect("/auth");
   }
 
-  const { todayWorkoutDay, workoutStreak, consistencyByDay } = homeData.data;
+  const hasHomeData = homeData.status === 200;
+  const todayWorkoutDay = hasHomeData ? homeData.data.todayWorkoutDay : undefined;
+  const workoutStreak = hasHomeData ? homeData.data.workoutStreak : 0;
+  const consistencyByDay = hasHomeData ? homeData.data.consistencyByDay : {};
   const userName = session.data.user.name?.split(" ")[0] ?? "";
 
   return (

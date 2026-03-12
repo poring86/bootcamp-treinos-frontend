@@ -37,6 +37,7 @@ export function WorkoutDayCard({
           alt={name}
           fill
           className="pointer-events-none object-cover"
+          unoptimized
         />
       )}
       <div className="absolute inset-0 bg-foreground/40" />
