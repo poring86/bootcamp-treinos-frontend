@@ -6,14 +6,19 @@ const nextConfig: NextConfig = {
       {
         protocol: "http",
         hostname: "localhost",
-        port: "8081",
+        port: "8080",
         pathname: "/public/**",
       },
       {
         protocol: "http",
         hostname: "127.0.0.1",
-        port: "8081",
+        port: "8080",
         pathname: "/public/**",
+      },
+      {
+        protocol: "https",
+        hostname: "gw8hy3fdcv.ufs.sh",
+        pathname: "/**",
       },
     ],
   },
