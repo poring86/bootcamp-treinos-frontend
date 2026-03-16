@@ -32,6 +32,7 @@ export const customFetch = async <T>(
     ...options,
     headers: requestHeaders,
     credentials: "include",
+    cache: "no-store",
   };
 
   try {

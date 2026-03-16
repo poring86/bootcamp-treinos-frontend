@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { authClient } from "@/app/_lib/auth-client";
 import { headers } from "next/headers";
-import { getHomeData } from "./_lib/api/fetch-generated";
+import { getHomeData, getUserTrainData } from "./_lib/api/fetch-generated";
 import dayjs from "dayjs";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,10 +20,18 @@ export default async function Home() {
   if (!session.data?.user) redirect("/auth");
 
   const today = dayjs();
-  const homeData = await getHomeData(today.format("YYYY-MM-DD"));
+  const [homeData, trainData] = await Promise.all([
+    getHomeData(today.format("YYYY-MM-DD")),
+    getUserTrainData(),
+  ]);
 
-  if (homeData.status !== 200) {
-    throw new Error("Failed to fetch home data");
+  if (homeData.status !== 200 || trainData.status !== 200) {
+    throw new Error("Failed to fetch data");
+  }
+
+  // Se não houver um plano de treino ativo, manda para o onboarding
+  if (!homeData.data.activeWorkoutPlanId) {
+    redirect("/onboarding");
   }
 
   const { todayWorkoutDay, workoutStreak, consistencyByDay } = homeData.data;
@@ -65,11 +73,18 @@ export default async function Home() {
               Bora treinar hoje?
             </p>
           </div>
-          <div className="rounded-full bg-primary px-4 py-2">
+          <Link
+            href={
+              todayWorkoutDay
+                ? `/workout-plans/${todayWorkoutDay.workoutPlanId}/days/${todayWorkoutDay.id}`
+                : `/workout-plans/${homeData.data.activeWorkoutPlanId}`
+            }
+            className="rounded-full bg-primary px-4 py-2 hover:bg-primary/90 transition-colors"
+          >
             <span className="font-heading text-sm font-semibold text-primary-foreground">
               Bora!
             </span>
-          </div>
+          </Link>
         </div>
       </div>
 
@@ -78,9 +93,9 @@ export default async function Home() {
           <h2 className="font-heading text-lg font-semibold text-foreground">
             Consistência
           </h2>
-          <button className="font-heading text-xs text-primary">
+          <Link href="/stats" className="font-heading text-xs text-primary hover:underline">
             Ver histórico
-          </button>
+          </Link>
         </div>
 
         <div className="flex items-center gap-3">
@@ -105,9 +120,12 @@ export default async function Home() {
             <h2 className="font-heading text-lg font-semibold text-foreground">
               Treino de Hoje
             </h2>
-            <button className="font-heading text-xs text-primary">
+            <Link
+              href={`/workout-plans/${homeData.data.activeWorkoutPlanId}`}
+              className="font-heading text-xs text-primary hover:underline"
+            >
               Ver treinos
-            </button>
+            </Link>
           </div>
 
           <Link
